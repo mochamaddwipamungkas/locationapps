@@ -5,10 +5,10 @@
 }
 
 .maps {
-  width: 700px;
+  width: 500px;
   margin: 0 auto;
 }
 
 .leaflet-container {
-  height: 100vh;
+  height: 50vh;
 }
