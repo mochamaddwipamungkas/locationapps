@@ -1,0 +1,14 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.maps {
+  width: 700px;
+  margin: 0 auto;
+}
+
+.leaflet-container {
+  height: 100vh;
+}
