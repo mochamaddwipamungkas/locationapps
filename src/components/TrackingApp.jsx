@@ -46,7 +46,7 @@ const TrackingApp = () => {
         kordinat: [location.latitude, location.longitude],
       });
     }
-  }, [user, location, getUser]);
+  }, [user, location]);
 
   useEffect(() => {
     const getData = async () => {
@@ -59,7 +59,7 @@ const TrackingApp = () => {
       }
     };
     getData();
-  });
+  }, [getUser]);
 
   const getLocation = () => {
     const watchId = navigator.geolocation.watchPosition(
@@ -72,7 +72,7 @@ const TrackingApp = () => {
       },
       {
         enableHighAccuracy: true,
-        timeout: 2000,
+        timeout: 20000,
         maximumAge: 1000,
         distanceFilter: 10,
       } // Atur interval pembaruan (distanceFilter dalam meter)
@@ -103,7 +103,7 @@ const TrackingApp = () => {
     }
   };
   return (
-    <div style={{ padding: "30px 60px" }}>
+    <div style={{ padding: "20px 30px" }}>
       <h1>Tracking App</h1>
       {user ? (
         <div>
@@ -113,7 +113,7 @@ const TrackingApp = () => {
           </button>
           {location ? (
             <>
-              <div style={{ padding: "20px", border: "1px solid #d8d8d8" }}>
+              <div style={{ padding: "10px", border: "1px solid #d8d8d8" }}>
                 <MapContainer
                   center={[location.latitude, location.longitude]}
                   zoom={13}
