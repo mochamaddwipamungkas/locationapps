@@ -36,14 +36,14 @@ const TrackingApp = () => {
     if (user && location) {
       console.log("ini user", user);
       console.log("ini lokasi", location);
-      set(ref(db, "users/"), {
-        uid: user.uid,
+      const id = user.uid;
+      set(ref(db, "users/" + id), {
         nama: user.displayName,
         photoURL: user.photoURL,
         kordinat: [location.latitude, location.longitude],
       });
     }
-  }, [user]);
+  }, [user, location]);
 
   useEffect(() => {
     const getData = async () => {
