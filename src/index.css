@@ -7,6 +7,8 @@
 .maps {
   width: 500px;
   margin: 0 auto;
+  padding: 30px;
+  border: 1px solid #7ff53b;
 }
 
 .leaflet-container {

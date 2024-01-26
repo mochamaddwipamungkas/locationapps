@@ -9,11 +9,13 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { ref, set, get } from "firebase/database";
+import { ref, set, get, remove } from "firebase/database";
+import "../index.css";
 
 const TrackingApp = () => {
   const [user, setUser] = useState(null);
   const [location, setLocation] = useState(null);
+  const [getUser, setGetUser] = useState({});
 
   const customIcon = new Icon({
     iconUrl: "/img/location-pin.png",
@@ -38,19 +40,20 @@ const TrackingApp = () => {
       console.log("ini lokasi", location);
       const id = user.uid;
       set(ref(db, "users/" + id), {
+        uid: user.uid,
         nama: user.displayName,
         photoURL: user.photoURL,
         kordinat: [location.latitude, location.longitude],
       });
     }
-  }, [user, location]);
+  }, [user, location, getUser]);
 
   useEffect(() => {
     const getData = async () => {
       const userRef = ref(db, "users");
       try {
         const snapshot = await get(userRef);
-        console.log("snapshot", snapshot.val());
+        setGetUser(snapshot.val());
       } catch (error) {
         console.log(error);
       }
@@ -90,37 +93,98 @@ const TrackingApp = () => {
       console.log(error);
     }
   };
+
+  const handleLogout = async () => {
+    try {
+      await remove(ref(db, `users/${user.uid}`));
+      await auth.signOut();
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
-    <div>
+    <div style={{ padding: "30px 60px" }}>
       <h1>Tracking App</h1>
       {user ? (
         <div>
-          <p>Welcome, {user.displayName}!</p>
-          <button onClick={() => auth.signOut()}>Sign Out</button>
+          <p style={{ margin: "10px 0" }}>Welcome, {user.displayName}!</p>
+          <button style={{ margin: "10px 0" }} onClick={handleLogout}>
+            Sign Out
+          </button>
           {location ? (
             <>
-              <MapContainer
-                center={[location.latitude, location.longitude]}
-                zoom={13}
-                scrollWheelZoom={true}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Marker
-                  position={[location.latitude, location.longitude]}
-                  icon={customIcon}
+              <div style={{ padding: "20px", border: "1px solid #d8d8d8" }}>
+                <MapContainer
+                  center={[location.latitude, location.longitude]}
+                  zoom={13}
+                  scrollWheelZoom={true}
                 >
-                  <Popup>
-                    A pretty CSS3 popup. <br /> Easily customizable.
-                  </Popup>
-                </Marker>
-              </MapContainer>
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <Marker
+                    position={[location.latitude, location.longitude]}
+                    icon={customIcon}
+                  >
+                    <Popup>
+                      A pretty CSS3 popup. <br /> Easily customizable.
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
+
               <p>
                 Lokasi saat ini: Latitude {location.latitude}, Longitude{" "}
                 {location.longitude}
               </p>
+
+              <h2
+                style={{
+                  marginTop: "10px",
+                }}
+              >
+                Online
+              </h2>
+
+              <div>
+                <ul style={{ content: "2022", marginRight: "0.5em" }}>
+                  {Object.keys(getUser).map((key) => (
+                    <li
+                      key={key}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          marginRight: "0.2em",
+                          fontSize: "2em",
+                          color: "#7ff53b",
+                        }}
+                      >
+                        •
+                      </span>
+                      <img
+                        style={{ borderRadius: "50%" }}
+                        src={getUser[key].photoURL}
+                        alt=""
+                        width={40}
+                      />
+                      <p
+                        style={{
+                          paddingLeft: "10px",
+                          fontSize: "1.2em",
+                        }}
+                      >
+                        {getUser[key].nama}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </>
           ) : (
             <p>Mendapatkan lokasi...</p>
