@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -9,6 +10,7 @@ import { getAnalytics } from "firebase/analytics";
 const firebaseConfig = {
   apiKey: "AIzaSyBXdGyqUJwIF5nujfJFqWXs_g9YE8Uf3fw",
   authDomain: "trackingapps-25483.firebaseapp.com",
+  databaseURL: "https://trackingapps-25483-default-rtdb.firebaseio.com",
   projectId: "trackingapps-25483",
   storageBucket: "trackingapps-25483.appspot.com",
   messagingSenderId: "256805038209",
@@ -18,4 +20,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+export { auth, app, db };

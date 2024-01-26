@@ -4,10 +4,12 @@ const LocationUpdater = () => {
   const [location, setLocation] = useState(null);
 
   useEffect(() => {
+    console.log("sebelum", location);
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
         setLocation({ latitude, longitude });
+        console.log("sesudah", location);
       },
       (error) => {
         console.error(error.message);
