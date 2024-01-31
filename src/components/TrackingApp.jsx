@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { Icon } from "leaflet";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { db, auth } from "../config/firebase";
+import "../index.css";
 
 import {
   onAuthStateChanged,
@@ -16,11 +17,6 @@ const TrackingApp = () => {
   const [user, setUser] = useState(null);
   const [location, setLocation] = useState(null);
   const [getUser, setGetUser] = useState({});
-
-  const customIcon = new Icon({
-    iconUrl: "/img/location-pin.png",
-    iconSize: [38, 38],
-  });
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -46,7 +42,7 @@ const TrackingApp = () => {
         kordinat: [location.latitude, location.longitude],
       });
     }
-  }, [user, location]);
+  }, [location, user]);
 
   useEffect(() => {
     const getData = async () => {
@@ -59,7 +55,7 @@ const TrackingApp = () => {
       }
     };
     getData();
-  }, [getUser]);
+  }, [getUser, user]);
 
   const getLocation = () => {
     const watchId = navigator.geolocation.watchPosition(
@@ -98,6 +94,7 @@ const TrackingApp = () => {
     try {
       await remove(ref(db, `users/${user.uid}`));
       await auth.signOut();
+      setUser(null);
     } catch (error) {
       console.log(error);
     }
@@ -123,14 +120,47 @@ const TrackingApp = () => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                  <Marker
-                    position={[location.latitude, location.longitude]}
-                    icon={customIcon}
-                  >
-                    <Popup>
-                      A pretty CSS3 popup. <br /> Easily customizable.
-                    </Popup>
-                  </Marker>
+                  {getUser ? (
+                    <>
+                      {Object.keys(getUser).map((key) => {
+                        return (
+                          <div
+                            style={{ padding: "20px", border: "1px solid red" }}
+                          >
+                            <Marker
+                              key={key}
+                              position={[
+                                getUser[key].kordinat[0],
+                                getUser[key].kordinat[1],
+                              ]}
+                              icon={
+                                new Icon({
+                                  className: "img_User",
+                                  iconUrl: `${getUser[key].photoURL}`,
+                                  iconSize: [25, 25],
+                                })
+                              }
+                            >
+                              <Popup>{getUser[key].nama}</Popup>
+                            </Marker>
+                          </div>
+                        );
+                      })}
+                    </>
+                  ) : (
+                    <Marker
+                      position={[location.latitude, location.longitude]}
+                      icon={
+                        new Icon({
+                          className: "img_User",
+                          iconUrl: `${user.photoURL}`,
+                          iconSize: [38, 38],
+                        })
+                      }
+                    >
+                      <Popup>{user.displayName}</Popup>
+                    </Marker>
+                  )}
                 </MapContainer>
               </div>
 
@@ -148,42 +178,44 @@ const TrackingApp = () => {
               </h2>
 
               <div>
-                <ul style={{ content: "2022", marginRight: "0.5em" }}>
-                  {Object.keys(getUser).map((key) => (
-                    <li
-                      key={key}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginTop: "10px",
-                      }}
-                    >
-                      <span
+                {getUser && (
+                  <ul style={{ content: "2022", marginRight: "0.5em" }}>
+                    {Object.keys(getUser).map((key) => (
+                      <li
+                        key={key}
                         style={{
-                          marginRight: "0.2em",
-                          fontSize: "2em",
-                          color: "#7ff53b",
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
                         }}
                       >
-                        •
-                      </span>
-                      <img
-                        style={{ borderRadius: "50%" }}
-                        src={getUser[key].photoURL}
-                        alt=""
-                        width={40}
-                      />
-                      <p
-                        style={{
-                          paddingLeft: "10px",
-                          fontSize: "1.2em",
-                        }}
-                      >
-                        {getUser[key].nama}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
+                        <span
+                          style={{
+                            marginRight: "0.2em",
+                            fontSize: "2em",
+                            color: "#7ff53b",
+                          }}
+                        >
+                          •
+                        </span>
+                        <img
+                          style={{ borderRadius: "50%" }}
+                          src={getUser[key].photoURL}
+                          alt=""
+                          width={40}
+                        />
+                        <p
+                          style={{
+                            paddingLeft: "10px",
+                            fontSize: "1.2em",
+                          }}
+                        >
+                          {getUser[key].nama}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </>
           ) : (

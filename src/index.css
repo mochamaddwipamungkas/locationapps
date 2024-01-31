@@ -12,3 +12,8 @@
 .leaflet-container {
   height: 50vh;
 }
+
+.img_User {
+  border-radius: 50%;
+  border: 3px solid white;
+}
